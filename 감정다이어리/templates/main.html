@@ -2,25 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-            crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-            crossorigin="anonymous"></script>
-
+    <!-- Bulma CSS 링크 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <!--웹폰트-->
     <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@800&display=swap" rel="stylesheet">
+    <!--js-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 
     <title>main</title>
     <style>
@@ -41,50 +33,104 @@
             font-weight: normal;
             font-style: normal;
         }
-        body{
-            background-color: darkorange;
-        }
-        .boxes {
-            width: 400px;
-            height: 500px;
-            margin: 300px auto;
-            padding: 70px 50px;
+
+        .box {
+            margin: 200px auto 0px auto;
+            width: 500px;
+            padding: 20px;
             text-align: center;
-            background-color: rgba( 255, 255, 255, 0.5 );
-            border-radius: 30px;
         }
 
-        h6{
-            margin-bottom: 40px;
-        }
     </style>
+    <script>
+        function toggle_sign_up() {
+            $("#sign-up-box").toggleClass("is-hidden")
+            $("#div-sign-in-or-up").toggleClass("is-hidden")
+            $("#btn-check-dup").toggleClass("is-hidden")
+            $("#help-id").toggleClass("is-hidden")
+            $("#help-password").toggleClass("is-hidden")
+        }
+    </script>
 </head>
 <body>
-<div class="warp">
-    <div class="boxes">
-        <h3 style="font-family: GmarketSansBold">토닥토닥 감정다이어리</h3>
-        <h6>오늘의 당신의 감정은 어떤가요</h6>
-        <div class="box">
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon1">id</span>
-                </div>
-                <input type="text" class="form-control" placeholder="id" aria-label="Username"
-                       aria-describedby="basic-addon1">
+<div class="box">
+    <p style="font-family: GmarketSansBold; font-size: 40px; color: steelblue">토닥토닥 감정다이어리</p>
+    <p style="margin-bottom: 20px; color: gray;">오늘 당신의 감정은 어떠신가요?</p>
+    <section class="section">
+        <div class="container">
+            <div class="" style="max-width: 480px;margin:auto">
+                <article class="media">
+                    <div class="media-content">
+                        <div class="content">
+                            <div class="field has-addons">
+                                <div class="control has-icons-left" style="width:100%">
+                                    <input id="input-username" class="input" type="text" placeholder="아이디">
+                                    <span class="icon is-small is-left"><i class="fa fa-user"></i></span>
+                                </div>
+                                <div id="btn-check-dup" class="control is-hidden">
+                                    <button class="button is-sparta " onclick="check_dup()">중복확인</button>
+                                </div>
+
+                            </div>
+                            <p id="help-id" class="help is-hidden">아이디는 2-10자의 영문과 숫자와 일부 특수문자(._-)만 입력 가능합니다.</p>
+                            <p id="help-id-login" class="help is-danger"></p>
+
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input id="input-password" class="input" type="password" placeholder="비밀번호">
+                                    <span class="icon is-small is-left"><i class="fa fa-lock"></i></span>
+                                </div>
+                                <p id="help-password" class="help is-hidden">영문과 숫자 조합의 8-20자의 비밀번호를 설정해주세요. <br>
+                                    특수문자(!@#$%^&*)도 사용 가능합니다.</p>
+                            </div>
+
+
+                        </div>
+                        <div id="div-sign-in-or-up" class="has-text-centered">
+                            <nav class="level is-mobile">
+                                <button class="level-item button is-sparta" onclick="sign_in()">
+                                    로그인
+                                </button>
+
+                            </nav>
+                            <hr>
+                            <h4 class="mb-3">아직 회원이 아니라면</h4>
+                            <nav class="level is-mobile">
+
+                                <button class="level-item button is-sparta is-outlined"
+                                        onclick="toggle_sign_up()">
+                                    회원가입하기
+                                </button>
+                            </nav>
+                        </div>
+
+                        <div id="sign-up-box" class="is-hidden">
+                            <div class="mb-5">
+                                <div class="field is-hidden">
+                                    <div class="control has-icons-left" style="width:100%">
+                                        <input id="input-password2" class="input" type="password"
+                                               placeholder="비밀번호 재입력">
+                                        <span class="icon is-small is-left"><i class="fa fa-lock"></i></span>
+                                    </div>
+                                    <p id="help-password2" class="help">비밀번호를 다시 한 번 입력해주세요.</p>
+
+                                </div>
+                            </div>
+                            <nav class="level is-mobile">
+                                <button class="level-item button is-sparta" onclick="sign_up()">
+                                    회원가입
+                                </button>
+                                <button class="level-item button is-sparta is-outlined" onclick="toggle_sign_up()">
+                                    취소
+                                </button>
+                            </nav>
+                        </div>
+                    </div>
+                </article>
             </div>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon1">pw</span>
-                </div>
-                <input type="text" class="form-control" placeholder="pw" aria-label="Username"
-                       aria-describedby="basic-addon1">
-            </div>
-            <button type="button" class="btn btn-light">로그인</button>
-            <hr>
-            <p>아직 회원이 아니신가요</p>
-            <button type="button" class="btn btn-light">회원가입</button>
+
         </div>
-    </div>
+    </section>
 </div>
 </body>
 </html>
