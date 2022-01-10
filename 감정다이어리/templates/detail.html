@@ -31,7 +31,67 @@
             margin: auto;
         }
     </style>
+    <script>
+        $(document).ready(function() {
+            show_emotion();
+        })
 
+         function write_emotion() {
+            let text = $('#text-box').val()
+
+            $.ajax({
+                type: "POST",
+                url: "/detail/list",
+                data: {text_give: text}
+            })
+             window.location.reload();
+        }
+
+        function show_emotion() {
+                $.ajax({
+                    type: "GET",
+                    url: "/detail/list",
+                    data: {},
+                    success: function (response) {
+                        let emotions = response['all_emotions']
+                        for (let i = 0; i < emotions.length; i++) {
+                            let text = emotions[i]['text']
+
+                            let temp_html = `<div class="media-content">
+                                                <div class="content">
+                                                    <p>
+                                                        <strong>Name</strong>
+                                                        <br>
+                                                        ${text}
+                                                    </p>
+                                                </div>
+                                                <nav class="level is-mobile">
+                                                    <div class="level-left">
+                                                        <a class="level-item" aria-label="reply">
+                                                                <span class="icon is-small">
+                                                                  <i class="fas fa-reply" aria-hidden="true"></i>
+                                                                </span>
+                                                        </a>
+                                                        <a class="level-item" aria-label="retweet">
+                                                                <span class="icon is-small">
+                                                                  <i class="fas fa-retweet" aria-hidden="true"></i>
+                                                                </span>
+                                                        </a>
+                                                        <a class="level-item" aria-label="like">
+                                                                <span class="icon is-small">
+                                                                  <i class="fas fa-heart" aria-hidden="true"></i>
+                                                                </span>
+                                                        </a>
+                                                    </div>
+                                                </nav>
+                                            </div>`
+
+                            $('#emotions-card').append(temp_html)
+                        }
+                    }
+                })
+            }
+    </script>
 </head>
 <body>
 <section class="hero is-primary is-bold is-medium">
@@ -57,60 +117,26 @@
     <div class="media-content">
         <div class="field">
             <p class="control">
-                <textarea class="textarea" placeholder="Add a comment..."></textarea>
+                <textarea class="textarea" id="text-box"></textarea>
             </p>
         </div>
         <nav class="level">
             <div class="level-left">
                 <div class="level-item">
-                    <a class="button is-info">Submit</a>
+                    <a class="button is-info" onclick="write_emotion()">작성하기</a>
                 </div>
             </div>
             <div class="level-right">
                 <div class="level-item">
-                    <label class="checkbox">
-                        <input type="checkbox"> Press enter to submit
-                    </label>
                 </div>
             </div>
         </nav>
     </div>
 </article>
+<div id="emotions-card"></div>
 <div class="box">
     <article class="media">
         <div class="media-left">
-            <figure class="image is-64x64">
-                <img src="https://bulma.io/images/placeholders/128x128.png" alt="Image">
-            </figure>
-        </div>
-        <div class="media-content">
-            <div class="content">
-                <p>
-                    <strong>John Smith</strong> <small>@johnsmith</small> <small>31m</small>
-                    <br>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit
-                    amet massa fringilla egestas. Nullam condimentum luctus turpis.
-                </p>
-            </div>
-            <nav class="level is-mobile">
-                <div class="level-left">
-                    <a class="level-item" aria-label="reply">
-                            <span class="icon is-small">
-                              <i class="fas fa-reply" aria-hidden="true"></i>
-                            </span>
-                    </a>
-                    <a class="level-item" aria-label="retweet">
-                            <span class="icon is-small">
-                              <i class="fas fa-retweet" aria-hidden="true"></i>
-                            </span>
-                    </a>
-                    <a class="level-item" aria-label="like">
-                            <span class="icon is-small">
-                              <i class="fas fa-heart" aria-hidden="true"></i>
-                            </span>
-                    </a>
-                </div>
-            </nav>
         </div>
     </article>
 </div>
