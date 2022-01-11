@@ -6,7 +6,7 @@ import jwt
 app = Flask(__name__)
 
 from pymongo import MongoClient
-client = MongoClient('localhost', 27017)
+client = MongoClient('13.125.241.131', 27017)
 db = client.EmotionDairy
 
 SECRET_KEY = 'SPARTA'
