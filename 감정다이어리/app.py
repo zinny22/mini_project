@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 # EC2 IP
 from pymongo import MongoClient
-client = MongoClient('13.125.241.131', 27017)
+client = MongoClient('13.125.241.131', 27017, username="test", password="test")
 db = client.EmotionDairy
 
 # JWT관련
