@@ -5,10 +5,12 @@ from datetime import datetime, timedelta
 import jwt
 app = Flask(__name__)
 
+# EC2 IP
 from pymongo import MongoClient
 client = MongoClient('13.125.241.131', 27017)
 db = client.EmotionDairy
 
+# JWT관련
 SECRET_KEY = 'SPARTA'
 
 ## HTML을 주는 부분
