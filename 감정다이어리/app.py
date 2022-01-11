@@ -21,6 +21,7 @@ def home():
     return render_template('detail.html')
 
 ## API 역할을 하는 부분
+# 글 작성하기
 @app.route('/detail/list', methods=['POST'])
 def write_emotion():
     text_recive = request.form['text_give']
