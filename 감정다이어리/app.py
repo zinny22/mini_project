@@ -1,18 +1,20 @@
 from flask import Flask, render_template, jsonify, request
+import hashlib
+import datetime
+from datetime import datetime, timedelta
+import jwt
 app = Flask(__name__)
 
 from pymongo import MongoClient
 client = MongoClient('localhost', 27017)
 db = client.dbsparta
 
+SECRET_KEY = 'SPARTA'
+
 ## HTML을 주는 부분
 @app.route('/')
 def main():
     return render_template('main.html')
-
-@app.route('/login')
-def login():
-    return render_template('login.html')
 
 @app.route('/detail')
 def home():
@@ -26,6 +28,49 @@ def write_emotion():
         'text': text_recive
     }
     db.emotion.insert_one(doc)
+
+##로그인&회원가입 코드##
+## 아이디 중복 확인 서버쪽 코드
+@app.route('/sign/check_dup', methods=['POST'])
+def check_dup():
+    username_receive = request.form['username_give']
+    exists = bool(db.users.find_one({'username': username_receive}))
+    return jsonify({'result': 'success', 'exists': exists})
+
+@app.route('/sign_up/save', methods=['POST'])
+def sign_up():
+    username_receive = request.form['username_give']
+    password_receive = request.form['password_give']
+    password_hash = hashlib.sha256(password_receive.encode('utf-8')).hexdigest()
+    doc = {
+        "username": username_receive,                               # 아이디
+        "password": password_hash,                                  # 비밀번호
+        "profile_name": username_receive,                           # 프로필 이름 기본값은 아이디
+    }
+    db.users.insert_one(doc)
+    return jsonify({'result': 'success'})
+
+##로그인 서버
+@app.route('/sign_in', methods=['POST'])
+def sign_in():
+    username_receive = request.form['username_give']
+    password_receive = request.form['password_give']
+
+    pw_hash = hashlib.sha256(password_receive.encode('utf-8')).hexdigest()
+    result = db.users.find_one({'username': username_receive, 'password': pw_hash})
+
+    if result is not None:
+        payload = {
+         'id': username_receive,
+         'exp': datetime.utcnow() + timedelta(seconds=60 * 60 * 24)  # 로그인 24시간 유지
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
+
+        return jsonify({'result': 'success', 'token': token})
+    # 찾지 못하면
+    else:
+        return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 일치하지 않습니다.'})
+
 
 @app.route('/detail/list', methods=['GET'])
 def read_diary():
@@ -61,7 +106,7 @@ def sadpost():
 
     db.emotion.update_one({'username':name_receive},{'$set': {'sad': new_sad}})
 
-    return jsonify({'msg': '슬퍼요..'}
+    return jsonify({'msg': '슬퍼요..'})
 
 @app.route('/detail/angry', methods=['POST'])
 def angrypost():
