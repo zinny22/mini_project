@@ -5,10 +5,12 @@ from datetime import datetime, timedelta
 import jwt
 app = Flask(__name__)
 
+# EC2 IP
 from pymongo import MongoClient
-client = MongoClient('localhost', 27017)
-db = client.dbsparta
+client = MongoClient('13.125.241.131', 27017, username="test", password="test")
+db = client.EmotionDairy
 
+# JWT관련
 SECRET_KEY = 'SPARTA'
 
 ## HTML을 주는 부분
@@ -21,6 +23,7 @@ def home():
     return render_template('detail.html')
 
 ## API 역할을 하는 부분
+# 글 작성하기
 @app.route('/detail/list', methods=['POST'])
 def write_emotion():
     text_recive = request.form['text_give']
