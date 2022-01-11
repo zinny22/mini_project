@@ -61,7 +61,7 @@ def sadpost():
 
     db.emotion.update_one({'username':name_receive},{'$set': {'sad': new_sad}})
 
-    return jsonify({'msg': '슬퍼요..'}
+    return jsonify({'msg': '슬퍼요..'})
 
 @app.route('/detail/angry', methods=['POST'])
 def angrypost():
