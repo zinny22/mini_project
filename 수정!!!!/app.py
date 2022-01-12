@@ -27,24 +27,6 @@ import hashlib
 #################################
 ##  HTML을 주는 부분             ##
 #################################
-# @app.route('/')
-# def home():
-#     token_receive = request.cookies.get('mytoken')
-#     try:
-#         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-#         user_info = db.user.find_one({"id": payload['id']})
-#         return render_template('login.html', nickname=user_info["nick"])
-#     except jwt.ExpiredSignatureError:
-#         return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
-#     except jwt.exceptions.DecodeError:
-#         return redirect(url_for("login", msg="로그인 정보가 존재하지 않습니다."))
-#
-#
-# @app.route('/login')
-# def login():
-#     msg = request.args.get("msg")
-#     return render_template('login.html', msg=msg)
-
 
 @app.route('/')
 def home():
@@ -53,10 +35,13 @@ def home():
 
 @app.route('/detail')
 def main():
-
-    return render_template('index.html')
-
-
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user_info = db.user.find_one({"username": payload['id']})
+        return render_template('index.html', user_info=user_info)
+    except jwt.ExpiredSignatureError:
+        return render_template('login.html')
 
 #################################
 ##  로그인을 위한 API            ##
@@ -139,23 +124,22 @@ def sign_in():
 # 로그인된 유저만 call 할 수 있는 API입니다.
 # 유효한 토큰을 줘야 올바른 결과를 얻어갈 수 있습니다.
 # (그렇지 않으면 남의 장바구니라든가, 정보를 누구나 볼 수 있겠죠?)
-@app.route('/api/nick', methods=['GET'])
-def api_valid():
-    token_receive = request.cookies.get('mytoken')
-
-    # try / catch 문?
-    # try 아래를 실행했다가, 에러가 있으면 except 구분으로 가란 얘기입니다.
-    try:
-        # token을 시크릿키로 디코딩합니다.
-        # 보실 수 있도록 payload를 print 해두었습니다. 우리가 로그인 시 넣은 그 payload와 같은 것이 나옵니다.
-        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-        print(payload)
-        # payload 안에 id가 들어있습니다. 이 id로 유저정보를 찾습니다.
-        # 여기에선 그 예로 닉네임을 보내주겠습니다.
-        userinfo = db.user.find_one({'id': payload['id']}, {'_id': 0})
-        return jsonify({'result': 'success', 'nickname': userinfo['nick']})
-    except jwt.exceptions.DecodeError:
-        return jsonify({'result': 'fail', 'msg': '로그인 정보가 존재하지 않습니다.'})
+# @app.route('/api/nick', methods=['GET'])
+# def api_valid():
+#     token_receive = request.cookies.get('mytoken')
+#     # try / catch 문?
+#     # try 아래를 실행했다가, 에러가 있으면 except 구분으로 가란 얘기입니다.
+#     try:
+#         # token을 시크릿키로 디코딩합니다.
+#         # 보실 수 있도록 payload를 print 해두었습니다. 우리가 로그인 시 넣은 그 payload와 같은 것이 나옵니다.
+#         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+#         print(payload)
+#         # payload 안에 id가 들어있습니다. 이 id로 유저정보를 찾습니다.
+#         # 여기에선 그 예로 닉네임을 보내주겠습니다.
+#         userinfo = db.user.find_one({'id': payload['id']}, {'_id': 0})
+#         return jsonify({'result': 'success', 'nickname': userinfo['nick']})
+#     except jwt.exceptions.DecodeError:
+#         return jsonify({'result': 'fail', 'msg': '로그인 정보가 존재하지 않습니다.'})
 
 
 #########################
@@ -190,11 +174,10 @@ def posting():
 ##포스팅 불러오기
 @app.route('/write/list', methods=['GET'])
 def read_diary():
+    token_receive = request.cookies.get('mytoken')
     posts = list(db.writes.find({}, {'_id': False}))
-    return jsonify({'all_posts':posts})
+    return jsonify({'all_posts': posts})
 
-    # token_receive = request.cookies.get('mytoken')
-    #
     # try:
     #     payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
     #     posts = list(db.writes.find({}).sort("date", -1).limit(10))
@@ -209,9 +192,35 @@ def read_diary():
 @app.route('/detail/delete', methods=['POST'])
 def deletepost():
     text_receive = request.form['text_give']
-    db.posts.delete_one({'text': text_receive})
+    db.writes.delete_one({'text': text_receive})
     return jsonify({'msg': '삭제 완료!'})
 
+
+# 슬퍼요 표시하기
+
+@app.route('/sad', methods=['POST'])
+def sad():
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user_info = db.users.find_one({"username": payload["id"]})
+        post_id_receive = request.form["post_id_give"]
+        type_receive = request.form["type_give"]
+        action_receive = request.form["action_give"]
+        doc = {
+            "post_id": post_id_receive,
+            "nickname": user_info["nickname"],
+            "type": type_receive
+        }
+        if action_receive == "like":
+            db.likes.insert_one(doc)
+        else:
+            db.likes.delete_one(doc)
+        count = db.likes.count_documents({"post_id": post_id_receive, "type": type_receive})
+        return jsonify({"result": "success", 'msg': 'updated', "count": count})
+
+    except (jwt.ExpiredSignature, jwt.exceptions.DecodeError):
+        return redirect(url_for('home'))
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
