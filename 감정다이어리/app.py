@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, redirect, url_for
 import hashlib
 import datetime
 from datetime import datetime, timedelta
@@ -9,6 +9,8 @@ app = Flask(__name__)
 from pymongo import MongoClient
 client = MongoClient('13.125.241.131', 27017, username="test", password="test")
 db = client.EmotionDairy
+# db_user = (list(db.users.find({}, {"username":True, "_id":False})))
+# db.emotion.insert_many(db_user)
 
 # JWT관련
 SECRET_KEY = 'SPARTA'
@@ -22,15 +24,28 @@ def main():
 def home():
     return render_template('detail.html')
 
-## API 역할을 하는 부분
-# 글 작성하기
+# API 역할을 하는 부분 글 작성하기
 @app.route('/detail/list', methods=['POST'])
-def write_emotion():
-    text_recive = request.form['text_give']
-    doc = {
-        'text': text_recive
-    }
-    db.emotion.insert_one(doc)
+def write_diary():
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user_info = db.users.find_one({"username": payload["id"]})
+        text_receive = request.form["text_give"]
+        doc = {
+            "username": user_info["username"],
+            "text": text_receive
+        }
+        db.posts.insert_one(doc)
+        return jsonify({"result": "success", 'msg': '포스팅 성공'})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
+
+
+@app.route('/detail/list', methods=['GET'])
+def read_diary():
+    posts = list(db.posts.find({}, {'_id': False}))
+    return jsonify({'all_posts':posts})
 
 ##로그인&회원가입 코드##
 ## 아이디 중복 확인 서버쪽 코드
@@ -73,12 +88,6 @@ def sign_in():
     # 찾지 못하면
     else:
         return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 일치하지 않습니다.'})
-
-
-@app.route('/detail/list', methods=['GET'])
-def read_diary():
-    emotions = list(db.emotion.find({}, {'_id': False}))
-    return jsonify({'all_emotions':emotions})
 
 # 귤 : 감정 이모티콘 부분 추가합니다! db 명칭은 기탁님꺼랑 맞추었습니다!1/11
 @app.route('/detail/like', methods=['POST'])
@@ -131,16 +140,9 @@ def angrypost():
 
 @app.route('/detail/delete', methods=['POST'])
 def deletepost():
-    sample_receive = request.form['sample_give']
-    print(sample_receive)
-    return jsonify({'msg': '삭제되었습니다!'})
-    """ 서버 연결시에 이렇게 변경할거에요! 
-    username_receive = request.form['username_give']
-    db.emotion.delete_one({'username': username_receive})
-    return jsonify({'msg': '삭제가 완료되었습니다'})
-    """
+    text_receive = request.form['text_give']
+    db.posts.delete_one({'text': text_receive})
+    return jsonify({'msg': '삭제 완료!'})
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
-
-
