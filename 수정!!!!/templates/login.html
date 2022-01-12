@@ -45,10 +45,8 @@
         }
 
         body {
+            background-color: rgba(47,138,241,0.1);
             height: 200vh;
-            background-image: url('https://i.pinimg.com/564x/c5/5b/34/c55b341ea8b67055cbf4ec1c3e6e5855.jpg');
-            background-repeat: no-repeat;
-            background-size: cover;
         }
 
     </style>
@@ -242,7 +240,7 @@
                                     <span class="icon is-small is-left"><i class="fa fa-user"></i></span>
                                 </div>
                                 <div id="btn-check-dup" class="control is-hidden">
-                                    <button class="button is-sparta " onclick="check_dup()">중복확인</button>
+                                    <button class="button is-sparta has-text-white" onclick="check_dup()" style="background-color: steelblue">중복확인</button>
                                 </div>
 
                             </div>
@@ -255,7 +253,7 @@
                                     <span class="icon is-small is-left"><i class="fa fa-user"></i></span>
                                 </div>
                                 <div id="btn-check-dup2" class="control">
-                                    <button class="button is-sparta " onclick="check_dup2()">중복확인</button>
+                                    <button class="button is-sparta has-text-white " onclick="check_dup2()" style="background-color: steelblue">중복확인</button>
                                 </div>
 
                             </div>
@@ -274,7 +272,7 @@
                         </div>
                         <div id="div-sign-in-or-up" class="has-text-centered">
                             <nav class="level is-mobile">
-                                <button class="level-item button is-sparta" onclick="sign_in()">
+                                <button class="level-item button is-sparta has-text-white" onclick="sign_in()" style="background-color: steelblue">
                                     로그인
                                 </button>
 
@@ -283,7 +281,7 @@
                             <h4 class="mb-3">아직 회원이 아니라면</h4>
                             <nav class="level is-mobile">
 
-                                <button class="level-item button is-sparta is-outlined"
+                                <button class="level-item button is-sparta is-outlined "
                                         onclick="toggle_sign_up()">
                                     회원가입하기
                                 </button>
@@ -303,7 +301,7 @@
                                 </div>
                             </div>
                             <nav class="level is-mobile">
-                                <button class="level-item button is-sparta" onclick="sign_up()">
+                                <button class="level-item button is-sparta has-text-white" onclick="sign_up()" style="background-color: steelblue">
                                     회원가입
                                 </button>
                                 <button class="level-item button is-sparta is-outlined" onclick="toggle_sign_up()">

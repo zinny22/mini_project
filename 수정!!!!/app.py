@@ -172,20 +172,17 @@ def posting():
 
 
 ##포스팅 불러오기
-@app.route('/write/list', methods=['GET'])
+@app.route('/posing', methods=['GET'])
 def read_diary():
     token_receive = request.cookies.get('mytoken')
-    posts = list(db.writes.find({}, {'_id': False}))
-    return jsonify({'all_posts': posts})
-
-    # try:
-    #     payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-    #     posts = list(db.writes.find({}).sort("date", -1).limit(10))
-    #     for post in posts:
-    #         post['_id'] = str(post['_id'])
-    #     return jsonify({"result": "success", 'posts': posts})
-    # except (jwt.ExpiredSignature, jwt.exceptions.DecodeError):
-    #     return redirect(url_for('home'))
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        posts = list(db.writes.find({}).sort("date", -1).limit(10))
+        for post in posts:
+            post["_id"] = str(post["_id"])
+        return jsonify({"result": "success", "posts": posts})
+    except (jwt.ExpiredSignature, jwt.exceptions.DecodeError):
+        return redirect(url_for('home'))
 
 
 ##포스팅 삭제하기

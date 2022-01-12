@@ -13,6 +13,7 @@
     <!--js-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css"/>
 
@@ -39,13 +40,8 @@
         .box {
             margin: 20px auto 10px auto;
             width: 800px;
-        }
-
-        body {
-            height: 200vh;
-            background-image: url('https://i.pinimg.com/564x/c5/5b/34/c55b341ea8b67055cbf4ec1c3e6e5855.jpg');
-            background-repeat: no-repeat;
-            background-size: cover;
+            background-color: rgba(47, 138, 241, 0.1);
+            border-radius: 20px;
         }
 
         .media {
@@ -62,7 +58,7 @@
         .emotion {
             width: 30px;
             height: 30px;
-            margin-right: 20px;
+            margin-right: 50px;
             display: inline-block;
         }
     </style>
@@ -88,15 +84,16 @@
         function show_emotion() {
             $.ajax({
                 type: "GET",
-                url: "/write/list",
+                url: "/posing",
                 data: {},
                 success: function (response) {
-                    let posts = response['all_posts']
+                    let posts = response["posts"]
                     for (let i = 0; i < posts.length; i++) {
-                        let nickname = posts[i]['nickname']
+                        let post = posts[i]['_id']
+                        let date = posts[i]['data'].slice(0, 10)
                         let text = posts[i]['text']
-                        let data = posts[i]['data'].slice(0, 10) // 년-월-일 에서 문자열 잘라서 표기
-                        let temp_html = `<div class="box" id="${posts["_id"]}">
+                        let nickname = posts[i]['nickname']
+                        let temp_html = `<div class="box" id="${post}">
                                             <article class="media">
                                                 <div class="media-left">
                                                     <figure class="image is-64x64">
@@ -106,34 +103,32 @@
                                                 <div class="media-content">
                                                     <div class="content">
                                                         <p>
-                                                            <strong>${nickname}</strong> <small>${data}</small>
+                                                            <strong>${nickname}</strong> <small>${date}</small>
                                                             <br>
-                                                            ${text}
+                                                                ${text}
                                                         </p>
                                                     </div>
                                                     <nav class="level is-mobile">
                                                         <div class="level-left">
-                                                            <a class="level-item" aria-label="sad" onclick="toggle_sad('${post['_id']}','sad')">
-                                                    <span class="icon is-small">
-                                                      <i class="far fa-sad-tear" aria-hidden="true"></i>
-                                                    </span>
+                                                            <a class="level-item" aria-label="like" onclick="toggle_sad()">
+                                                                <span class="icon is-small"><i class="fas fa-heart" aria-hidden="true"></i></span>
                                                             </a>
                                                         </div>
                                                     </nav>
                                                 </div>
                                                 <div>
-                                                    <a href="" onclick="likepost('${nickname}');return false;"><img src="static/smile.png" class="emotion"></a>0
-                                                    <a href="" onclick="sadpost('${nickname}');return false;"><img src="static/sad.png" class="emotion emotion2"></a>0
-
-                                                    <div class="emotion deletebtn"><a href="#" onclick="deletepost('${text}')"><img src ="static/delete.png"></a></div>
+                                                    <div class="emotion">
+                                                        <a href="#" onclick="deletepost('${text}')">
+                                                            <img src="static/delete.png">
+                                                        </a>
+                                                    </div>
                                                 </div>
                                             </article>
-                                            </div>
-                                        `
-                        $('#boxes').append(temp_html)
+                                        </div>`
+                        $('#post_box').append(temp_html)
                     }
                 }
-            })
+            });
         }
 
         $(document).ready(function () {
@@ -154,74 +149,37 @@
         }
 
         //슬퍼요 함수
-        function toggle_sad(post_id, type) {
-            let $a_like = $(`#${post_id} a[aria-label='heart']`)
-            let $i_like = $a_like.find("i")
-            if ($i_like.hasClass("fas-sad-tear")) {
-                $.ajax({
-                    type: "POST",
-                    url: "/sad",
-                    data: {
-                        post_id_give: post_id,
-                        type_give: type,
-                        action_give: "unlike"
-                    },
-                    success: function (response) {
-                        $i_like.addClass("far-sad-tear").removeClass("fas-sad-tear")
-                        $a_like.find("span.like-num").text(response["count"])
-                    }
-                })
-            } else {
-                $.ajax({
-                    type: "POST",
-                    url: "/sad",
-                    data: {
-                        post_id_give: post_id,
-                        type_give: type,
-                        action_give: "like"
-                    },
-                    success: function (response) {
-                        console.log("like")
-                        $i_like.addClass("fas-sad-tear").removeClass("far-sad-tear")
-                        $a_like.find("span.like-num").text(response["count"])
-                    }
-                })
-
-            }
-        }
     </script>
 </head>
 <body>
-
-<section class="hero is-white is-opacity-50%">
+<section class="hero is-medium" style="background-color: steelblue; height: 300px">
     <div class="hero-body">
-        <nav class="level">
-            <p class="level-item has-text-centered ">
-                <a class="link is-info title" style="color: steelblue" ;>토닥도닥 감정다이어리</a>
-            </p>
-            <p class="level-item has-text-centered">
-                <a class="link is-info subtitle" href="index.html">{{user_info.nickname}}</a>
-            </p>
-        </nav>
+        <p class="title" style="font-family: GmarketSansBold; color: white">
+            토닥도닥 감정다이어리
+        </p>
+        <p class="subtitle has-text-white">
+            {{ user_info.nickname }}
+        </p>
     </div>
 </section>
 <article class="media">
     <figure class="media-left">
         <p class="image is-64x64">
-            <img src="https://cdn-icons-png.flaticon.com/512/569/569501.png">
-        <p id="nickname" class="subtitle">{{user_info.nickname}}</p>
+            <img src="https://cdn-icons-png.flaticon.com/512/569/569501.png" style="margin-top: 20px">
+        <p id="nickname" class="subtitle has-text-centered " style="margin-top: 10px;">{{ user_info.nickname }}</p>
         </p>
     </figure>
     <div class="media-content">
         <div class="field">
             <p class="control">
-                <textarea class="textarea" id="text-box"></textarea>
+                <input class="input is-rounded textarea" type="text" placeholder="Rounded input" id="text-box">
             </p>
         </div>
         <nav class="level">
             <div class="level-left">
                 <div class="level-item">
-                    <a class="button is-info has-text-white" onclick="write_emotion()">작성하기</a>
+                    <a class="button is-info has-text-white is-focus " onclick="write_emotion()"
+                       style="background-color: steelblue">작성하기</a>
                 </div>
             </div>
 
@@ -232,38 +190,35 @@
         </nav>
     </div>
 </article>
-<div id="boxes">
+<div id="post_box">
     <div class="box">
         <article class="media">
             <div class="media-left">
-                <figure class="image is-128x128">
+                <figure class="image is-64x64">
                     <img src="https://cdn-icons-png.flaticon.com/512/569/569501.png" alt="Image">
                 </figure>
             </div>
             <div class="media-content">
                 <div class="content">
                     <p>
-                        <strong>${nickname}</strong> <small>${data}</small>
+                        <strong>${nickname}</strong> <small>${date}</small>
                         <br>
-                        ${text}
+                            ${text}
                     </p>
                 </div>
                 <nav class="level is-mobile">
                     <div class="level-left">
                         <a class="level-item" aria-label="like" onclick="toggle_sad()">
-                                                    <span class="icon is-small">
-                                                      <i class="fas fa-heart" aria-hidden="true"></i>
-                                                    </span>
+                            <span class="icon is-small"><i class="fas fa-heart" aria-hidden="true"></i></span>
                         </a>
                     </div>
                 </nav>
             </div>
             <div>
-                <a href="" onclick="likepost('${nickname}');return false;"><img src="static/smile.png" class="emotion"></a>0
-                <a href="" onclick="sadpost('${nickname}');return false;"><img src="static/sad.png"
-                                                                               class="emotion emotion2"></a>0
-
-                <div class="emotion deletebtn"><a href="#" onclick="deletepost('${text}')"><img src="static/delete.png"></a>
+                <div class="emotion">
+                    <a href="#" onclick="deletepost('${text}')">
+                        <img src="static/delete.png">
+                    </a>
                 </div>
             </div>
         </article>
