@@ -45,7 +45,7 @@ def write_diary():
 @app.route('/detail/list', methods=['GET'])
 def read_diary():
     posts = list(db.posts.find({}, {'_id': False}))
-    return jsonify({'all_emotions':posts})
+    return jsonify({'all_posts':posts})
 
 ##로그인&회원가입 코드##
 ## 아이디 중복 확인 서버쪽 코드
@@ -141,7 +141,7 @@ def angrypost():
 @app.route('/detail/delete', methods=['POST'])
 def deletepost():
     text_receive = request.form['text_give']
-    db.emotion.delete_one({'text': text_receive})
+    db.posts.delete_one({'text': text_receive})
     return jsonify({'msg': '삭제 완료!'})
 
 if __name__ == '__main__':

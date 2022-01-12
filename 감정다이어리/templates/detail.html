@@ -100,27 +100,30 @@
                 url: "/detail/list",
                 data: {text_give: text},
                 success: function (response) {
+                    alert(response["msg"]);
                     window.location.reload()
+                }
             })
         }
 
         function show_emotion() {
             $.ajax({
                 type: "GET",
-                url: "/get_posts?username_give=${username}",
+                url: "/detail/list",
                 data: {},
                 success: function (response) {
-                    if (response["result"] == "success") {
-                        let posts = response["posts"]
+                        let posts = response['all_posts']
                         for (let i = 0; i < posts.length; i++) {
-                            let post = posts[i]
 
-                        let temp_html = `<div class="media-content">
+                            let username = posts[i]['username']
+                            let text = posts[i]['text']
+
+                            let temp_html = `<div class="media-content">
                                                 <div class="content">
                                                     <p>
-                                                        <strong>${post['username']}</strong>
+                                                        <strong>${username}</strong>
                                                         <br>
-                                                        ${post['text']}
+                                                        ${text}
                                                     </p>
                                                 </div>
                                                 <nav class="level is-mobile">
@@ -149,58 +152,58 @@
                                                     <div class="emotion deletebtn"><a href="#" onclick="deletepost('${text}')"><img src ="static/delete.png"></a></div>
                                                 </div>
                                             </div>`
-                        //공감 이모티콘 및 삭제 버튼 추가했습니다!!! 숫자와 onlcick 부분 변경해야 함
-                        $('#emotions-card').append(temp_html)
+                            //공감 이모티콘 및 삭제 버튼 추가했습니다!!! 숫자와 onlcick 부분 변경해야 함
+                            $('#emotions-card').append(temp_html)
+                        }
                     }
-                }
             })
         }
 
-        //이규리 : 추가 했습니다!! 아직 data 아이디값을 잘몰라서 app.py랑 연결시켜놓은 상태입니다! 밑에 주석으로 달린걸로 변경할 예정입니다!  1/11
-        function likepost(username) {
-            $.ajax({
-                type: 'POST',
-                url: '/detail/like',
-                data: {'username_give': username},
-                success: function (response) {
-                    alert(response['msg']);
-                }
-            });
-        }
+            //이규리 : 추가 했습니다!! 아직 data 아이디값을 잘몰라서 app.py랑 연결시켜놓은 상태입니다! 밑에 주석으로 달린걸로 변경할 예정입니다!  1/11
+            function likepost(username) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/detail/like',
+                    data: {'username_give': username},
+                    success: function (response) {
+                        alert(response['msg']);
+                    }
+                });
+            }
 
-        function sadpost(username) {
-            $.ajax({
-                type: 'POST',
-                url: '/detail/sad',
-                data: {'username_give': username},
-                success: function (response) {
-                    alert(response['msg']);
-                }
-            });
-        }
+            function sadpost(username) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/detail/sad',
+                    data: {'username_give': username},
+                    success: function (response) {
+                        alert(response['msg']);
+                    }
+                });
+            }
 
-        function angrypost(username) {
-            $.ajax({
-                type: 'POST',
-                url: '/detail/angry',
-                data: {'username_give': username},
-                success: function (response) {
-                    alert(response['msg']);
-                }
-            });
-        }
+            function angrypost(username) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/detail/angry',
+                    data: {'username_give': username},
+                    success: function (response) {
+                        alert(response['msg']);
+                    }
+                });
+            }
 
-        function deletepost(text) {
-            $.ajax({
-                type: 'POST',
-                url: '/detail/delete',
-                data: {text_give: text},
-                success: function (response) {
-                    alert(response['msg']);
-                    window.location.reload();
-                }
-            });
-        }
+            function deletepost(text) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/detail/delete',
+                    data: {text_give: text},
+                    success: function (response) {
+                        alert(response['msg']);
+                        window.location.reload();
+                    }
+                });
+            }
     </script>
 </head>
 <body>
@@ -219,11 +222,7 @@
 
 
 <article class="media">
-    <figure class="media-left">
-        <p class="image is-64x64">
-            <img src="https://bulma.io/images/placeholders/128x128.png">
-        </p>
-    </figure>
+    <text>test</text>
     <div class="media-content">
         <div class="field">
             <p class="control">
@@ -245,7 +244,7 @@
     </div>
 </article>
 <div id="emotions-card"></div>
-<div class="box">
+<div class="box" id="box-card">
     <article class="media">
         <div class="media-left">
         </div>
