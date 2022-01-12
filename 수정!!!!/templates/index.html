@@ -82,6 +82,7 @@
 
         //포스팅 보여주기 함수
         function show_emotion() {
+            $('#post_box').empty();
             $.ajax({
                 type: "GET",
                 url: "/posing",
@@ -110,8 +111,8 @@
                                                     </div>
                                                     <nav class="level is-mobile">
                                                         <div class="level-left">
-                                                            <a class="level-item" aria-label="like" onclick="toggle_sad()">
-                                                                <span class="icon is-small"><i class="fas fa-heart" aria-hidden="true"></i></span>
+                                                            <a class="level-item" aria-label="sad" onclick="toggle_sad(${post},'sad')">
+                                                                <span class="icon is-small"><i class="far fa-sad-tear" aria-hidden="true"></i></span>
                                                             </a>
                                                         </div>
                                                     </nav>
@@ -149,6 +150,7 @@
         }
 
         //슬퍼요 함수
+
     </script>
 </head>
 <body>
@@ -209,7 +211,7 @@
                 <nav class="level is-mobile">
                     <div class="level-left">
                         <a class="level-item" aria-label="like" onclick="toggle_sad()">
-                            <span class="icon is-small"><i class="fas fa-heart" aria-hidden="true"></i></span>
+                            <span class="icon is-small"><i class="far fa-sad-tear" aria-hidden="true"></i></span>
                         </a>
                     </div>
                 </nav>

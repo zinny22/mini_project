@@ -193,31 +193,6 @@ def deletepost():
     return jsonify({'msg': '삭제 완료!'})
 
 
-# 슬퍼요 표시하기
-
-@app.route('/sad', methods=['POST'])
-def sad():
-    token_receive = request.cookies.get('mytoken')
-    try:
-        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-        user_info = db.users.find_one({"username": payload["id"]})
-        post_id_receive = request.form["post_id_give"]
-        type_receive = request.form["type_give"]
-        action_receive = request.form["action_give"]
-        doc = {
-            "post_id": post_id_receive,
-            "nickname": user_info["nickname"],
-            "type": type_receive
-        }
-        if action_receive == "like":
-            db.likes.insert_one(doc)
-        else:
-            db.likes.delete_one(doc)
-        count = db.likes.count_documents({"post_id": post_id_receive, "type": type_receive})
-        return jsonify({"result": "success", 'msg': 'updated', "count": count})
-
-    except (jwt.ExpiredSignature, jwt.exceptions.DecodeError):
-        return redirect(url_for('home'))
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
