@@ -190,16 +190,28 @@ def posting():
 ##포스팅 불러오기
 @app.route('/write/list', methods=['GET'])
 def read_diary():
-    token_receive = request.cookies.get('mytoken')
+    posts = list(db.writes.find({}, {'_id': False}))
+    return jsonify({'all_posts':posts})
 
-    try:
-        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-        posts = list(db.writes.find({}).sort("date", -1).limit(10))
-        for post in posts:
-            post['_id'] = str(post['_id'])
-        return jsonify({"result": "success"})
-    except (jwt.ExpiredSignature, jwt.exceptions.DecodeError):
-        return redirect(url_for('home'))
+    # token_receive = request.cookies.get('mytoken')
+    #
+    # try:
+    #     payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+    #     posts = list(db.writes.find({}).sort("date", -1).limit(10))
+    #     for post in posts:
+    #         post['_id'] = str(post['_id'])
+    #     return jsonify({"result": "success", 'posts': posts})
+    # except (jwt.ExpiredSignature, jwt.exceptions.DecodeError):
+    #     return redirect(url_for('home'))
+
+
+##포스팅 삭제하기
+@app.route('/detail/delete', methods=['POST'])
+def deletepost():
+    text_receive = request.form['text_give']
+    db.posts.delete_one({'text': text_receive})
+    return jsonify({'msg': '삭제 완료!'})
+
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
