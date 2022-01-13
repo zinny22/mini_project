@@ -14,10 +14,10 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
     <script src="http://code.jquery.com/jquery-latest.min.js"></script>
-
+    <script src=" https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css"/>
 
-    <title>login</title>
+    <title>토닥도닥 감정다이어리</title>
     <style>
         * {
             font-family: 'GmarketSansMedium';
@@ -67,14 +67,21 @@
             justify-content: center;
             align-items: center;
         }
+
+        .log_out {
+            margin: auto;
+            float: right;
+            display: inline-block;
+        }
+        .fas fa-sign-out-alt {
+
+        }
     </style>
     <script>
 
         //포스팅 저장하기 함수
         function write_emotion() {
-            // text-box 클래스에 입력된 값 추출
             let text = $('#text-box').val();
-            // 현재의 날짜와 시간을 문자열로 반환하여 추출
             let today = new Date().toISOString();
             $.ajax({
                 type: "POST",
@@ -85,26 +92,25 @@
                     window.location.reload();
                 }
             })
+
         }
 
         //포스팅 보여주기 함수
         function show_emotion() {
+            $('#post_box').empty();
             $.ajax({
                 type: "GET",
                 url: "/posing",
                 data: {},
                 success: function (response) {
                     if (response['result'] == "success") {
-                        // response 값을 posts로 설정
                         let posts = response["posts"]
                         for (let i = 0; i < posts.length; i++) {
-                            // wirtes 에서 각 document 추출하여 설정
+                            let post = posts[i]['_id']
                             let date = posts[i]['data'].slice(0, 10)
                             let text = posts[i]['text']
                             let nickname = posts[i]['nickname']
                             let like = posts[i]['like']
-                            let post = posts[i]['_id']
-                            // 포스팅 카드의 형식을 가져와 추출된 변수들을 각자의 위치에 맞게 대입
                             let temp_html = `<div class="box" id="${post}">
                                             <article class="media">
                                                 <div class="media-left">
@@ -137,7 +143,6 @@
                                                 </div>
                                             </article>
                                         </div>`
-                            // temp_html을 각 포스팅 카드에 대입
                             $('#post_box').append(temp_html)
                         }
                     }
@@ -161,7 +166,7 @@
                 }
             });
         }
-        // 좋아요 함수
+
         function likepost (text){
             $.ajax({
                 type: 'POST',
@@ -174,6 +179,13 @@
             });
         }
 
+        //로그아웃 함수
+        function logout() {
+            $.removeCookie('mytoken');
+            alert('로그아웃!')
+            window.location.href = "/login"
+        }
+
     </script>
 </head>
 <body>
@@ -183,8 +195,16 @@
             토닥도닥 감정다이어리
         </p>
         <p class="subtitle has-text-white">
-            {{ user_info.nickname }}
+            {{ user_info.nickname }}님 안녕하세요
         </p>
+        <nav class="log_out">
+            <div class="feeling_div">
+                <div class="level-item">
+                    <a class="button is-info has-text-white is-focus" onclick="logout()"
+                       style="background-color: steelblue" href="/login">로그아웃<a><i onclick="logout()" class="fas fa-sign-out-alt has-text-white"></i></a></a>
+                </div>
+            </div>
+        </nav>
     </div>
 </section>
 <article class="media">
@@ -197,7 +217,7 @@
     <div class="media-content">
         <div class="field">
             <p class="control">
-                <input class="input is-rounded textarea" type="text" placeholder="Rounded input" id="text-box">
+                <input class="input is-rounded textarea" type="text" placeholder="당신의 감정은 지금 어떠신가요?" id="text-box">
             </p>
         </div>
         <nav class="level">
@@ -216,6 +236,39 @@
     </div>
 </article>
 <div id="post_box">
+    <div class="box">
+        <article class="media">
+            <div class="media-left">
+                <figure class="image is-64x64">
+                    <img src="https://cdn-icons-png.flaticon.com/512/569/569501.png" alt="Image">
+                </figure>
+            </div>
+            <div class="media-content">
+                <div class="content">
+                    <p>
+                        <strong>nickname</strong> <small>date</small>
+                        <br>
+                        text
+                    </p>
+                </div>
+                <nav class="level is-mobile">
+                    <div class="feeling_div">
+                        <div class="level-item">
+                    <a class="button is-info has-text-white is-focus " onclick="like(nickname)"
+                       style="background-color: steelblue">좋아요{{ like }}</a>
+                </div>
+                    </div>
+                </nav>
+            </div>
+            <div>
+                <div class="emotion">
+                    <a href="#" onclick="deletepost('${text}')">
+                        <img src="static/delete.png">
+                    </a>
+                </div>
+            </div>
+        </article>
+    </div>
 </div>
 </body>
 </html>

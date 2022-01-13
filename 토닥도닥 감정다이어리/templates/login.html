@@ -13,9 +13,15 @@
     <!--js-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src=" https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css"/>
 
-    <title>login</title>
+    <title>토닥도닥 감정다이어리</title>
+    <meta property="og:title" content="토닥도닥 감정다이어리"/>
+    <meta property="og:description" content=":)"/>
+    <meta property="og:image" content="{{ url_for('static',filename='og_image.png') }}"/>
+    
     <style>
         * {
             font-family: 'GmarketSansMedium';
@@ -52,7 +58,6 @@
     </style>
     <script>
         //회원가입페이지로 넘어가기
-        // class에 is-hidden 입력된 값을 나타내기
         function toggle_sign_up() {
             $("#sign-up-box").toggleClass("is-hidden")
             $("#div-sign-in-or-up").toggleClass("is-hidden")
@@ -75,14 +80,11 @@
         }
 
 
-        // 아이디 중복 확인
+        //아이디 중복 확인
         function check_dup() {
             let username = $('#input-username').val();
-            // username이 공백이라면 help-id라는 id를 가진 p태그의 text를 변경,
-            // is-safe 클래스 삭제 후 is-danger이라는 클래스 추가
             if (username == "") {
                 $('#help-id').text('아이디를 입력해주세요').removeClass('is-safe').addClass('is-danger')
-                // input-username 클래스로 자동이동
                 $('#input-username').focus();
                 return;
             }
@@ -91,7 +93,6 @@
                 $('input-username').focus();
                 return;
             }
-            // 위 2개의 if문에 해당되지 않을 경우 ajax 실행
             $("#help-id").addClass("is-loading")
             $.ajax({
                 type: "POST",
@@ -231,7 +232,7 @@
 </head>
 <body>
 <div class="box">
-    <p style="font-family: GmarketSansBold; font-size: 40px; color: steelblue; text-align: center">토닥토닥 감정다이어리</p>
+    <p style="font-family: GmarketSansBold; font-size: 40px; color: steelblue; text-align: center">토닥도닥 감정다이어리</p>
     <p style="color: gray; text-align: center">오늘 당신의 감정은 어떠신가요?</p>
     <section class="section">
         <div class="container">
