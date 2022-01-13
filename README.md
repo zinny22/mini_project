@@ -30,7 +30,7 @@ http://arasaka.shop/
 
 3.실행화면 😄
 ------------------
-https://youtu.be/pHiBgzgBV5k
+https://youtu.be/ypaWwAnFqqg
 
 <br/>
 
