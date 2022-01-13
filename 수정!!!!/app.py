@@ -31,7 +31,8 @@ import hashlib
 @app.route('/')
 def home():
     msg = request.args.get("msg")
-    return render_template('login.html',msg=msg)
+    return render_template('login.html', msg=msg)
+
 
 @app.route('/detail')
 def main():
@@ -42,6 +43,7 @@ def main():
         return render_template('index.html', user_info=user_info)
     except jwt.ExpiredSignatureError:
         return render_template('login.html')
+
 
 #################################
 ##  로그인을 위한 API            ##
@@ -110,7 +112,7 @@ def sign_in():
 
     if result is not None:
         payload = {
-         'id': username_receive,
+            'id': username_receive,
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
         # token을 줍니다.
@@ -149,7 +151,6 @@ def sign_in():
 ##포스팅 디비저장
 @app.route('/write', methods=['POST'])
 def posting():
-
     token_receive = request.cookies.get('mytoken')
 
     try:
@@ -161,11 +162,12 @@ def posting():
         doc = {
             "nickname": user_info['nickname'],
             "text": text_receive,
-            "data": data_receive
+            "data": data_receive,
+            "like": 0
         }
 
         db.writes.insert_one(doc)
-        return jsonify({"result":"success", "msg": "글 저장 성공"})
+        return jsonify({"result": "success", "msg": "글 저장 성공"})
 
     except (jwt.ExpiredSignature, jwt.exceptions.DecodeError):
         return redirect(url_for('home'))
@@ -192,6 +194,18 @@ def deletepost():
     db.writes.delete_one({'text': text_receive})
     return jsonify({'msg': '삭제 완료!'})
 
+
+##좋아요
+@app.route('/detail/like', methods=['POST'])
+def likepost():
+    text_receive = request.form['text_give']
+    target_text = db.writes.find_one({'text': text_receive})
+    current_like = target_text['like']
+    new_like = current_like + 1
+
+    db.writes.update_one({'text': text_receive}, {'$set': {'like': new_like}})
+
+    return jsonify({'msg': '좋아요!'})
 
 
 if __name__ == '__main__':
